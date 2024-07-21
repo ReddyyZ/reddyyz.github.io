@@ -7,20 +7,10 @@ interface Project {
 
 const projectsData: Project[] = [
   {
-    title: 'A Search Engine',
-    description: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: '/static/images/google.png',
-    href: 'https://www.google.com',
-  },
-  {
-    title: 'The Time Machine',
-    description: `Imagine being able to travel back in time or to the future. Simple turn the knob
-    to the desired date and press "Go". No more worrying about lost keys or
-    forgotten headphones with this simple yet affordable solution.`,
-    imgSrc: '/static/images/time-machine.jpg',
-    href: '/blog/the-time-machine',
+    title: 'WorkoutLogs - Gym Tracker',
+    description: `O diário de treinos de academia definitivo, registre seus treinos treinos e acompanhe seu progresso!`,
+    imgSrc: '/static/images/workoutlogs.png',
+    href: 'https://workoutlogs.github.io/',
   },
 ]
 

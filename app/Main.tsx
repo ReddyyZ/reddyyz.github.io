@@ -3,20 +3,54 @@ import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import { formatDate } from 'pliny/utils/formatDate'
 import NewsletterForm from 'pliny/ui/NewsletterForm'
+import SocialIcon from '@/components/social-icons'
+import { Authors, allAuthors } from 'contentlayer/generated'
+import Image from '@/components/Image'
 
 const MAX_DISPLAY = 5
 
 export default function Home({ posts }) {
+  const author = allAuthors.find((p) => p.slug === 'default') as Authors
   return (
     <>
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        <div className="space-y-2 pb-8 pt-6 md:space-y-5">
-          <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
-            Latest
+        <div className='space-y-2 pb-8 pt-6 flex flex-col items-center md:space-y-5'>
+            <div className='border-lime-500 border-2 rounded-full p-2'>
+              {author && author.avatar && (
+                <Image
+                  src={author.avatar}
+                  alt="avatar"
+                  width={152}
+                  height={152}
+                  className="h-48 w-48 rounded-full"
+                />
+              )}
+            </div>
+          <h1 className='text-3xl font-extrabold leading-9 tracking-tight sm:text-4xl sm:leading-10 md:text-5xl md:leading-13'>
+            {siteMetadata.author}
           </h1>
-          <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
-            {siteMetadata.description}
+          <p className='text-lg text-center'>
+            Desenvolvedor, estudante e apaixonado por tecnologia.
           </p>
+          <div className="mb-3 flex space-x-4 justify-center">
+            <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} size={6} />
+            <SocialIcon kind="github" href={siteMetadata.github} size={6} />
+            <SocialIcon kind="facebook" href={siteMetadata.facebook} size={6} />
+            <SocialIcon kind="youtube" href={siteMetadata.youtube} size={6} />
+            <SocialIcon kind="linkedin" href={siteMetadata.linkedin} size={6} />
+            <SocialIcon kind="twitter" href={siteMetadata.twitter} size={6} />
+            <SocialIcon kind="x" href={siteMetadata.x} size={6} />
+            <SocialIcon kind="instagram" href={siteMetadata.instagram} size={6} />
+            <SocialIcon kind="threads" href={siteMetadata.threads} size={6} />
+          </div>
+        </div>
+        <div className="space-y-2 pb-4 pt-4 md:space-y-5">
+          <p className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-4xl md:leading-14">
+            Posts Recentes
+          </p>
+          {/* <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
+            {siteMetadata.description}
+          </p> */}
         </div>
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {!posts.length && 'No posts found.'}
