@@ -9,7 +9,7 @@ import SearchButton from './SearchButton'
 const Header = () => {
   return (
     <header className="flex items-center justify-between py-10">
-      <div>
+      {/* <div>
         <Link href="/" aria-label={siteMetadata.headerTitle}>
           <div className="flex items-center justify-between">
             <div className="mr-3">
@@ -24,10 +24,10 @@ const Header = () => {
             )}
           </div>
         </Link>
-      </div>
+      </div> */}
       <div className="flex items-center space-x-4 leading-5 sm:space-x-6">
         {headerNavLinks
-          .filter((link) => link.href !== '/')
+          // .filter((link) => link.href !== '/')
           .map((link) => (
             <Link
               key={link.title}
