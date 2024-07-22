@@ -3,7 +3,7 @@ const siteMetadata = {
   title: 'ReddyyZ | Artigos sobre hacking, segurança & programação',
   author: 'ReddyyZ',
   headerTitle: 'ReddyyZ',
-  // description: 'I\'m a programming student, and passionate about technology.',
+  description: 'Artigos sobre hacking, segurança & programação.',
   language: 'pt-br',
   theme: 'system', // system, dark or light
   siteUrl: 'https://reddyyz.github.io',
@@ -11,7 +11,7 @@ const siteMetadata = {
   siteLogo: '/static/images/logo.png',
   socialBanner: '/static/images/twitter-card.png',
   // mastodon: 'https://mastodon.social/@mastodonuser',
-  // email: 'address@yoursite.com',
+  email: 'arthur.reddyyz.contact@gmail.com',
   github: 'https://github.com/ReddyyZ',
   x: 'https://x.com/ReddyyZ_',
   // twitter: 'https://twitter.com/Twitter',
