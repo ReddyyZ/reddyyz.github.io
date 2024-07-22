@@ -14,25 +14,25 @@ export default function Home({ posts }) {
   return (
     <>
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        <div className='space-y-2 pb-8 pt-6 flex flex-col items-center md:space-y-5'>
-            <div className='border-lime-500 border-2 rounded-full p-2'>
-              {author && author.avatar && (
-                <Image
-                  src={author.avatar}
-                  alt="avatar"
-                  width={152}
-                  height={152}
-                  className="h-48 w-48 rounded-full"
-                />
-              )}
-            </div>
-          <h1 className='text-3xl font-extrabold leading-9 tracking-tight sm:text-4xl sm:leading-10 md:text-5xl md:leading-13'>
+        <div className="flex flex-col items-center space-y-2 pb-8 pt-6 md:space-y-5">
+          <div className="rounded-full border-2 border-lime-500 p-2">
+            {author && author.avatar && (
+              <Image
+                src={author.avatar}
+                alt="avatar"
+                width={152}
+                height={152}
+                className="h-48 w-48 rounded-full"
+              />
+            )}
+          </div>
+          <h1 className="text-3xl font-extrabold leading-9 tracking-tight sm:text-4xl sm:leading-10 md:text-5xl md:leading-13">
             {siteMetadata.author}
           </h1>
-          <p className='text-lg text-center'>
+          <p className="text-center text-lg">
             Desenvolvedor, estudante e apaixonado por tecnologia.
           </p>
-          <div className="mb-3 flex space-x-4 justify-center">
+          <div className="mb-3 flex justify-center space-x-4">
             <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} size={6} />
             <SocialIcon kind="github" href={siteMetadata.github} size={6} />
             <SocialIcon kind="facebook" href={siteMetadata.facebook} size={6} />
