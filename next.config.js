@@ -7,7 +7,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // You might need to insert additional domains in script-src if you are using external services
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app analytics.umami.is;
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app analytics.umami.is asciinema.org;
   style-src 'self' 'unsafe-inline';
   img-src * blob: data:;
   media-src *.s3.amazonaws.com;
@@ -56,7 +56,7 @@ const securityHeaders = [
 
 const output = process.env.EXPORT ? 'export' : undefined
 const basePath = process.env.BASE_PATH || undefined
-const unoptimized = process.env.UNOPTIMIZED ? true : undefined
+const unoptimized = process.env.UNOPTIMIZED || process.env.EXPORT ? true : undefined
 
 /**
  * @type {import('next/dist/next-server/server/config').NextConfig}
