@@ -1,0 +1,166 @@
+---
+title: 'Hashes - O que são e como quebrá-las'
+date: '2021-12-02'
+summary: Hashes são usadas para verificar a integridade de arquivos e armazenar senhas, por serem impossíveis de reverter. Porém com uma boa wordlist, é possível quebrá-las.
+tags: ['criptografia', 'password-cracking']
+draft: false
+---
+
+Hashes são usadas para verificar a integridade de arquivos e armazenar senhas, por serem impossíveis de reverter. Porém com uma boa wordlist e a ferramenta certa, é possível quebrá-las.
+
+<TOCInline toc={props.toc} asDisclosure />
+
+## O que é um hash
+
+Hash é um algoritmo criptográfico de mão única, que gera uma sequência de caracteres, única, de tamanho fixo e irreversível, a partir de uma sequencia de dados, independente de seu tamanho. Seu principal uso, é comparar uma grande quantidade de dados e/ou informações secretas. Assim, é muito usado para verificar a integridade de arquivos e armazenar senhas.
+
+Por ser impossível de reverter, o único método para descriptografar, é realizar um brute-force (ataque de força bruta), ataque que consiste em testar todas as possibilidades possíveis, e ir comparando com o hash que deseja quebrar.
+
+**Alguns exemplos:**
+
+```
+0800fc577294c34e0b28ad2839435945 - MD5
+
+2346ad27d7568ba9896f1b7da6b5991251debdf2 - SHA1
+
+d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa - SHA256
+
+$2a$12$2BSI1qNuMcq30sfMisR/o.yTMUJGS5phce6ZMb4UPfo/1PcjxQ5Cq - Bcrypt
+```
+
+## Tipos de hash
+
+Existem diversas funções hash, sendo as mais usadas MD5, SHA1, e Bcrypt. Porém a mais segura a se escolher, é o Bcrypt. Por precisar de mais processamento para gerar o hash, levando mais tempo para ser calculado e inviabilizando um brute-force.
+
+Comentando alguns pontos:
+  - [MD5](https://pt.wikipedia.org/wiki/MD5)
+    - Rápida para se calcular
+    - Suscetível a ataques de colisão (Dois hashes iguais)
+  - [SHA-1](https://pt.wikipedia.org/wiki/SHA-1)
+    - Rápida para se calcular
+  - [BCRYPT](https://pt.wikipedia.org/wiki/Bcrypt)
+    - É preciso mais processamento para gerá-la, tornando-a mais lenta e segura
+
+## Como quebrar
+
+Primeiro de tudo, vale lembrar que o sucesso ou não em crackear um hash, vai depender da sua wordlist, ferramenta, e também de seu computador.
+
+### Instalando as ferramentas necessárias:
+
+Existem várias ferramentas disponíveis, mas a minha favorita, e que vamos utilizar neste artigo, é a "John The Ripper", junto com a wordlist [rockyou.txt](https://github.com/praetorian-inc/Hob0Rules/blob/master/wordlists/rockyou.txt.gz?raw=true). Vamos aos comandos!
+
+```sh
+# Instalando o john
+$ apt-get update && apt-get install john -y
+
+# Baixando a wordlist
+
+$ wget https://github.com/praetorian-inc/Hob0Rules/blob/master/wordlists/rockyou.txt.gz?raw=true -O rockyou.txt.gz && gzip -d rockyou.txt.gz
+```
+
+### Identificando o tipo
+
+Essa etapa, na maioria das vezes pode ser pulada, mas caso não obtenha sucesso no *cracking*, você pode tentar realizar o ataque de forma mais específica.
+
+Uma boa tentativa para identificar, é usando a ferramenta [hashID](https://github.com/psypanda/hashID), script escrito em python. Seu uso é bastante simples, e ele possuí uma opção de mostrar o formato que você deve especificar no John the Ripper e em outra ferramenta muito usada, o HashCat, facilitando ainda mais o trabalho.
+
+```sh
+# Instalação
+
+$ sudo apt-get install python3 git 
+$ git clone https://github.com/psypanda/hashid.git 
+$ cd hashid 
+$ sudo install -g 0 -o 0 -m 0644 doc/man/hashid.7 /usr/share/man/man7/ 
+$ sudo gzip /usr/share/man/man7/hashid.7
+
+# Exemplos
+
+$ ./hashid.py '$P$8ohUJ.1sdFw09/bMaAQPTGDNi2BIUt1'
+Analyzing '$P$8ohUJ.1sdFw09/bMaAQPTGDNi2BIUt1'
+[+] Wordpress ≥ v2.6.2
+[+] Joomla ≥ v2.5.18
+[+] PHPass' Portable Hash
+
+$ ./hashid.py -mj '$racf$*AAAAAAAA*3c44ee7f409c9a9b'
+Analyzing '$racf$*AAAAAAAA*3c44ee7f409c9a9b'
+[+] RACF [Hashcat Mode: 8500][JtR Format: racf]
+
+$ ./hashid.py hashes.txt
+--File 'hashes.txt'--
+Analyzing '*85ADE5DDF71E348162894C71D73324C043838751'
+[+] MySQL5.x
+[+] MySQL4.1
+Analyzing '$2a$08$VPzNKPAY60FsAbnq.c.h5.XTCZtC1z.j3hnlDFGImN9FcpfR1QnLq'
+[+] Blowfish(OpenBSD)
+[+] Woltlab Burning Board 4.x
+[+] bcrypt
+--End of file 'hashes.txt'--
+
+
+```
+
+### Mãos na massa
+
+Agora que temos tudo preparado, vamos ao que interessa. Vou usar de exemplo esse hash MD5 `098f6bcd4621d373cade4e832627b4f6 : test`. Antes precisamos colocá-lo em um arquivo, e para iniciar o ataque basta rodar este simples comando:
+
+```sh
+$ echo -n 098f6bcd4621d373cade4e832627b4f6 > hash.txt
+
+$ john hash.txt --wordlist=rockyou.txt
+Warning: detected hash type "LM", but the string is also recognized as "Raw-MD5"
+Use the "--format=Raw-MD5" option to force loading these as that type instead
+Using default input encoding: UTF-8
+Using default target encoding: CP850
+Loaded 2 password hashes with no different salts (LM [DES 256/256 AVX2])
+Warning: poor OpenMP scalability for this hash type, consider --fork=2
+Will run 2 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+
+```
+
+Como podemos ver, ele identificou o tipo errado, então vamos ter que especificar com `--format=Raw-MD5`. 
+
+Vamos tentar novamente.
+
+```sh
+$ john hash.txt --wordlist=rockyou.txt --format=Raw-MD5
+Using default input encoding: UTF-8
+Loaded 1 password hash (Raw-MD5 [MD5 256/256 AVX2 8x3])
+Warning: no OpenMP support for this hash type, consider --fork=2
+Press 'q' or Ctrl-C to abort, almost any other key for status
+test             (?)
+1g 0:00:00:00 DONE (2021-12-02 09:32) 50.00g/s 8313Kp/s 8313Kc/s 8313KC/s tyson22..taurus89
+Use the "--show --format=Raw-MD5" options to display all of the cracked passwords reliably
+Session completed
+
+```
+Voilà! Conseguimos descriptografar com sucesso! Tenha em mente que este processo pode demorar entre alguns segundos, horas, dias, semanas... tudo depende da senha e de seu computador. E se a palavra-chave estiver em sua wordlist, o John vai encontrar.
+
+Vamos também testar com o bcrypt, para comparar o tempo que se leva para crackear cada uma das duas.
+
+```sh
+$ john bcrypt.txt --wordlist=rockyou.txt --format=bcrypt
+Using default input encoding: UTF-8
+Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])
+Cost 1 (iteration count) is 4096 for all loaded hashes
+Will run 2 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+0g 0:00:00:01 0,00% (ETA: 2021-12-08 02:08) 0g/s 14.87p/s 14.87c/s 14.87C/s ashley..liverpool
+0g 0:00:00:09 0,00% (ETA: 2021-12-15 09:48) 0g/s 13.65p/s 13.65c/s 13.65C/s 555555..sandra
+0g 0:00:01:17 0,01% (ETA: 2021-12-18 00:14) 0g/s 12.98p/s 12.98c/s 12.98C/s bullshit..bulldogs
+0g 0:00:03:13 0,01% (ETA: 2021-12-17 11:39) 0g/s 13.60p/s 13.60c/s 13.60C/s kickass..eliana
+0g 0:00:04:39 0,02% (ETA: 2021-12-17 08:18) 0g/s 13.65p/s 13.65c/s 13.65C/s bounce..smile4me
+0g 0:00:05:01 0,02% (ETA: 2021-12-17 04:27) 0g/s 13.77p/s 13.77c/s 13.77C/s buffalo..1angel
+0g 0:00:06:46 0,03% (ETA: 2021-12-16 23:38) 0g/s 13.90p/s 13.90c/s 13.90C/s june17..volcom1
+0g 0:00:06:49 0,03% (ETA: 2021-12-16 22:47) 0g/s 13.92p/s 13.92c/s 13.92C/s derrick1..keith1                                                                                     
+0g 0:00:18:16 0,09% (ETA: 2021-12-16 04:11) 0g/s 14.51p/s 14.51c/s 14.51C/s alistair..201088                                                                                     
+0g 0:00:18:30 0,09% (ETA: 2021-12-16 04:00) 0g/s 14.52p/s 14.52c/s 14.52C/s 101080..stafford
+Session aborted
+
+```
+
+E como podemos ver, o bcrypt é infinitamente superior em relação à segurança, demorando mais de 18 minutos e ainda sem resultado. Sendo em minha opinião, a melhor opção atualmente.
+
+## Obrigado
+
+Obrigado por ler até aqui! Caso ainda esteja com alguma dúvida, estou à disposição em meu [servidor do discord](https://discord.gg/v5d3PZ9).

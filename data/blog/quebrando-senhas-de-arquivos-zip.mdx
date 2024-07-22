@@ -1,0 +1,60 @@
+---
+title: 'Quebrando Senhas de Arquivos ZIP'
+date: '2020-09-09'
+tags: ['hacking', 'password-cracking']
+summary: Precisa abrir um arquivo zip com senha? Com uma boa wordlist e as ferramentas certas você pode quebrá-la e obter acesso aos arquivos protegidos!
+cover_image: https://reddyyz.github.io/images/posts/quebrando_zip.png
+draft: false
+---
+
+Precisa abrir um arquivo zip com senha? Com uma boa wordlist e as ferramentas certas você pode quebrá-la e obter acesso aos arquivos protegidos!<br/>
+Neste artigo você irá aprender a como crackear um arquivo zip!
+
+<TOCInline toc={props.toc} asDisclosure />
+
+### Instalando as ferramentas necessárias
+
+Para esse ataque vamos precisar da ferramenta [John the Ripper](https://github.com/openwall/john) e a famosa wordlist [rockyou.txt](https://github.com/praetorian-inc/Hob0Rules/blob/master/wordlists/rockyou.txt.gz?raw=true), com 14 milhões de senhas!
+
+- John the Ripper - Ferramenta para hash cracking
+- rockyou.txt - Wordlist com 14 milhões de senhas!
+
+Vamos a instalação!
+
+Caso esteja no debian ou no ubuntu, basta rodar o seguinte comando:
+```sh
+root@fsociety~# apt-get install john
+```
+<button class="copy" onClick="copy_to_clip2('apt-get install john')">Copiar comando</button>
+
+Com tudo instalado, já podemos começar!
+
+### Transformando o arquivo em um hash quebrável
+
+Vamos supor que você tenha um arquivo chamado `secreto.zip`, antes de quebrá-lo é preciso transformá-lo em um hash que o john possa quebrar, usando uma ferramenta que vem junto ao john chamada `zip2john`.
+
+Execute o seguinte comando para gerar o hash:
+```sh
+root@fsociety~# zip2john secreto.zip > hash.txt
+```
+<button class="copy" onClick="copy_to_clip2('zip2john secreto.zip > hash.txt')">Copiar comando</button>
+
+Agora com o hash do arquivo salvo em `hash.txt` já podemos quebrá-lo!
+
+### Quebrando o hash
+
+Com tudo o que precisamos, para quebrar o hash execute o seguinte comando:
+```sh
+root@fsociety~# john hash.txt --wordlist=rockyou.txt
+```
+<button class="copy" onClick="copy_to_clip2('john hash.txt --wordlist=rockyou.txt')">Copiar comando</button>
+
+E agora é esperar (o processo pode variar entre alguns segundos e várias horas dependendo da senha e do seu computador), caso a senha esteja na wordlist o john irá encontrá-la!
+
+![Quebrando ZIP](/images/posts/quebrando_zip.png)
+
+### Obrigado!
+
+Obrigado por ler até aqui! Caso tenha alguma dúvida entre no meu servidor do discord e pergunte!<br/>
+[Discord Server](https://discord.gg/v5d3PZ9)
+<br/>
