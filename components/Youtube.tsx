@@ -7,7 +7,7 @@ interface YoutubeProps {
 const Youtube = ({ videoId }: YoutubeProps) => {
   return (
     <iframe
-      className='w-full aspect-video'
+      className="aspect-video w-full"
       src={`https://www.youtube.com/embed/${videoId}`}
       title="YouTube Video"
       allowFullScreen
@@ -15,4 +15,4 @@ const Youtube = ({ videoId }: YoutubeProps) => {
   )
 }
 
-export default Youtube;
+export default Youtube
