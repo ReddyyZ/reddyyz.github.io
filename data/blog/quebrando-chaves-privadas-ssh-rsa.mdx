@@ -28,11 +28,11 @@ Primeiro, vamos criar uma chave SSH para que possamos tentar quebrá-la.
 $ ssh-keygen -t rsa
 ```
 
-![Gerando chave SSH](https://reddyyz.github.io/images/posts/gerando-chave-ssh.png)
+![Gerando chave SSH](/static/images/quebrando-chaves-ssh/gerando-chave-ssh.png)
 
 Especifique onde deseja salvar a chave, e escolha uma senha que esteja em sua wordlist.
 
-![Gerando chave SSH](https://reddyyz.github.io/images/posts/ssh-chaves.png)
+![Gerando chave SSH](/static/images/quebrando-chaves-ssh/ssh-chaves.png)
 
 Podemos ver que foram geradas a chave privada (id_rsa) e a chave públida (id_rsa.pub).
 Agora já podemos prosseguir com os testes.
@@ -57,7 +57,7 @@ Para crackear a chave, primeiro precisamos gerar um hash que a nossa ferramenta 
 $ ssh2john id_rsa > id_rsa.txt
 ```
 
-![Gerando chave SSH](https://reddyyz.github.io/images/posts/ssh-hash.png)
+![Gerando chave SSH](/static/images/quebrando-chaves-ssh/ssh-hash.png)
 
 Agora já podemos crackear a hash!
 
@@ -71,7 +71,7 @@ $ john id_rsa.txt --wordlist=rockyou.txt
 
 No caso, estou usando a famosa wordlist [rockyou.txt](https://github.com/praetorian-inc/Hob0Rules/blob/master/wordlists/rockyou.txt.gz).
 
-![Gerando chave SSH](https://reddyyz.github.io/images/posts/ssh-hash-quebrada.png)
+![Gerando chave SSH](/static/images/quebrando-chaves-ssh/ssh-hash-quebrada.png)
 
 Espere até que a ferramenta encontre a senha correta.
 
