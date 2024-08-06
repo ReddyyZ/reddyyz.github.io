@@ -1,0 +1,80 @@
+---
+title: 'Quebrando Chaves Privadas SSH/RSA'
+date: '2024-03-24'
+summary: 'Uma das melhores maneiras de proteger seu servidor SSH, é desabilitar os logins com senha e habilitar o login com chave privada RSA. Mas com uma boa wordlist e as ferramentas certas, essa segurança pode ser quebrada.'
+tags: ['hacking', 'criptografia']
+draft: false
+---
+
+Uma das melhores maneiras de proteger seu servidor SSH, é desabilitar os logins com senha e habilitar o login com chave privada RSA. Mas com uma boa wordlist e as ferramentas certas, essa segurança pode ser quebrada.
+
+---
+
+<TOCInline toc={props.toc} asDisclosure />
+
+## O que é a criptografia RSA
+
+A criptografia RSA é um sistema criptográfico baseado no sistema de criptografia assimétrica, considerado um dos mais seguros da atualidade.
+
+Esse sistema funciona com duas chaves criptográficas: pública (responsável apenas pela criptografia, pode ser compartilhada com todos) e privada (chave utilizada para descriptografar o conteúdo, deve ser guardada em segurança).
+
+A chave privada, vem normalmente protegida por uma senha, necessária para realizar o processo de descriptografia. Porém, com a wordlist certa podemos burlar este sistema, como será mostrado posteriormente neste artigo.
+
+## Criando uma chave SSH para teste
+
+Primeiro, vamos criar uma chave SSH para que possamos tentar quebrá-la.
+
+```sh
+$ ssh-keygen -t rsa
+```
+
+![Gerando chave SSH](https://reddyyz.github.io/images/posts/gerando-chave-ssh.png)
+
+Especifique onde deseja salvar a chave, e escolha uma senha que esteja em sua wordlist.
+
+![Gerando chave SSH](https://reddyyz.github.io/images/posts/ssh-chaves.png)
+
+Podemos ver que foram geradas a chave privada (id_rsa) e a chave públida (id_rsa.pub).
+Agora já podemos prosseguir com os testes.
+
+
+## Instalando as ferramentas necessárias
+Neste exemplo, usaremos a famosa ferramenta [John The Ripper](https://www.openwall.com/john/). 
+
+Ela é um password cracker baseado em wordlists, que suporta os mais diversos tipos de hashes.
+
+Para instalá-lo basta executar o seguinte comando:
+```sh
+$ apt-get install john
+```
+Ou baixando pelo [site oficial](https://www.openwall.com/john/).
+
+## Transformando a chave em um hash
+
+Para crackear a chave, primeiro precisamos gerar um hash que a nossa ferramenta possa quebrar.
+
+```sh
+$ ssh2john id_rsa > id_rsa.txt
+```
+
+![Gerando chave SSH](https://reddyyz.github.io/images/posts/ssh-hash.png)
+
+Agora já podemos crackear a hash!
+
+## Crackeando a chave RSA
+
+Com tudo pronto, basta rodar o seguinte comando usando a sua wordlist favorita.
+
+```sh
+$ john id_rsa.txt --wordlist=rockyou.txt
+```
+
+No caso, estou usando a famosa wordlist [rockyou.txt](https://github.com/praetorian-inc/Hob0Rules/blob/master/wordlists/rockyou.txt.gz).
+
+![Gerando chave SSH](https://reddyyz.github.io/images/posts/ssh-hash-quebrada.png)
+
+Espere até que a ferramenta encontre a senha correta.
+
+A senha foi encontrada com sucesso! ```football         (id_rsa) ```
+
+Tenha em mente que isso pode levar algum tempo, desde alguns segundos, até várias horas. Tudo vai depender do poder de processamento de seu computador e de sua wordlist. Mas se a senha estiver em sua wordlist, ela será encontrada!
