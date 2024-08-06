@@ -1,9 +1,9 @@
 ---
 title: 'DNS Spoofing: Como interceptar requisições DNS - Ataque MITM'
-date: '2024-08-04'
+date: '2024-08-05'
 summary: 'Como continuação do ultimo artigo, iremos aprender como funciona o ataque DNS Spoofing, e como redirecionar requisições DNS ao nosso servidor.'
 tags: ['hacking', 'mitm']
-draft: true
+draft: false
 ---
 
 Como continuação do ultimo artigo, iremos aprender como funciona o ataque DNS Spoofing, e como redirecionar requisições DNS ao nosso servidor.
@@ -96,7 +96,7 @@ Na função principal definimos todas as variáveis que precisamos e iniciamos o
 if __name__ == "__main__":
     info_interface = netifaces.ifaddresses("eth0") # Obtem informacoes sobre a placa de rede
 
-    local_ip = info_interface[netifaces.AF_LINK][0]['addr']
+    local_ip = info_interface[netifaces.AF_INET][0]['addr']
     local_mac = info_interface[netifaces.AF_LINK][0]['addr']
     redirect_ip = local_ip
 
@@ -119,3 +119,5 @@ E em seguida executamos o script do DNS Spoofing:
 Com isso, todas as requisições DNS do alvo serão redirecionadas ao nosso servidor falso.
 
 Agora vamos tentar acessar o site que queremos redirecionar `test.root`:
+
+<Youtube videoId="ulsonS-rDwc"/>
