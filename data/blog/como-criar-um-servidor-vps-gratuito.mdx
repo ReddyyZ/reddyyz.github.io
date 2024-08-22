@@ -1,0 +1,134 @@
+---
+title: 'Como criar um servidor VPS gratuito'
+summary: 'Uma VPS pode ser bastante útil durante o desenvolvimento de projetos web. Aprenda neste artigo a criar sua própria hospedagem VPS de forma 100% gratuita.'
+date: '2024-08-21'
+tags: ['vps', 'aws', 'tutorial']
+draft: true
+---
+
+<TOCInline toc={props.toc} asDisclosure />
+
+## O que é uma VPS
+
+Uma VPS (Virtual Private Server) é uma máquina virtual vendida por uma empresa de hospedagem. Ela é parte de um servidor físico que é dividido em várias máquinas virtuais, cada uma com seu próprio sistema operacional e recursos dedicados.
+
+## Por que usar uma VPS
+
+Existem várias razões para usar uma VPS em vez de um serviço de hospedagem compartilhada, incluindo:
+
+- Mais controle e flexibilidade devido ao acesso root
+- Maior segurança e privacidade
+- Melhor desempenho e escalabilidade
+
+Você pode usar um servidor VPS de diversas maneiras, como para o desenvolvimento de projetos web, armazenamento de arquivos e até mesmo como servidor VPN/Proxy.
+
+## Como criar um servidor VPS gratuito
+
+Existem várias maneiras de criar um servidor VPS gratuito, incluindo o uso de serviços como Amazon AWS, Google Cloud Platform e Microsoft Azure.
+
+Neste tutorial, vamos usar o nível gratuito da Amazon AWS.
+
+## Passo 1: Criar uma conta na AWS
+
+Primeiramente, você precisa criar uma conta na AWS.
+
+Esteja ciente de que você precisará de um cartão de crédito válido para criar uma conta na AWS, mesmo que você esteja usando o nível gratuito. Será cobrado o valor de US$1,00 temporariamente para verificar a sua identidade, que será estornado em seguida.
+
+> 1. Acesse o site [https://aws.amazon.com/pt/free/](https://aws.amazon.com/pt/free/), clique em "Criar uma conta" e insira seus dados pessoais.
+![Criando uma conta na AWS](/static/images/vps-gratis/criando-conta-aws.jpg)
+
+> 2. Após inserir seus dados pessoais, você precisará inserir os dados do seu cartão de crédito.
+![Dados cartao aws](/static/images/vps-gratis/dados-cartao-conta.jpg)
+
+## Passo 2: Criar uma instância EC2
+
+> 3. Depois de criar sua conta, acesse o console da AWS e vá na aba Services -> Compute -> EC2. 
+
+> 4. Em seguida, já no painel de controle EC2, clique em "Launch instance" para criar uma nova instância.
+![Criando uma instância EC2](/static/images/vps-gratis/criando-instancia-ec2.jpg)
+
+## Passo 3: Configurar a instância
+
+> 5. Na tela de configuração da instância, escolha o sistema operacional desejado entre as opções disponíveis (Amazon Linux, macOS, Ubuntu, Windows, Red Hat, SUSE Linux e Debian).
+![Selecionando sistema operacional](/static/images/vps-gratis/selecionando-os.jpg)
+
+> 6. Em seguida, escolha o tipo de instância desejado. No nível gratuito, você pode escolher a instância t2.micro, que é gratuita por até 750 horas por mês.
+![Selecionando tipo de instância](/static/images/vps-gratis/selecionando-tipo-instancia.jpg)
+
+Agora configure uma chave SSH para acessar a instância. 
+
+> 7. Clique em "Create a new key pair", insira um nome para a chave, selecione o tipo RSA, extensão `.pem` e clique em "Create key pair" para baixar a sua chave privada.
+![Criando chave SSH](/static/images/vps-gratis/criando-chave-ssh.jpg)
+![Criando chave SSH 2](/static/images/vps-gratis/criando-chave-ssh-2.jpg)
+
+> 8. Com tudo configurado, clique em "Launch instance" para criar a instância.
+![Launch Instance](/static/images/vps-gratis/launch-instance.jpg)
+
+## Passo 4: Acessar o servidor
+
+Após a criação da instância, você será redirecionado para uma página com os próximos passos.
+
+> 9. Clique em "Connect to your instance" para ver as instruções de acesso.
+![Conectando à instância](/static/images/vps-gratis/conectando-instancia.jpg)
+![Informações de acesso](/static/images/vps-gratis/informacoes-acesso-ssh.jpg)
+
+Na aba "SSH Client", copie o endereço de sua VPS.
+
+Com o terminal aberto, navegue até o diretório onde sua chave privada está salva e altere as permissões do arquivo.
+```bash
+chmod 400 SUA-CHAVE-PRIVADA.pem
+```
+
+E agora com tudo pronto podemos acessar a VPS via SSH. Execute o seguinte comando no terminal:
+```bash
+ssh -i "SUA-CHAVE-PRIVADA.pem" admin@ENDEREÇO-DA-SUA-VPS
+```
+
+> 10. Acessando a VPS
+![Acessando a VPS via SSH](/static/images/vps-gratis/acessando-vps-ssh.jpg)
+
+Pronto! Agora você tem um servidor VPS gratuito rodando na AWS com controle total.
+
+## Passo 5 (Bônus): Acessando a VPS via Celular (Android/IOS)
+
+Para acessar a VPS no celular, você pode usar o aplicativo Termius, que é um cliente SSH gratuito e fácil de usar.
+
+O Termius está disponível para os sistemas [Android](https://play.google.com/store/apps/details?id=com.server.auditor.ssh.client) e [IOS](https://apps.apple.com/us/app/termius-terminal-ssh-client/id549039908).
+
+> 11. Baixe o aplicativo Termius e crie uma conta ou entre sem login.
+
+> 12. Na tela inicial "Hosts" do aplicativo, clique no botão "+" e depois em "New Host" para adicionar a sua VPS.
+![Adicionando a VPS no Termius](/static/images/vps-gratis/adicionando-vps-termius.jpg)
+
+> 13. Preencha os campos com o endereço da sua VPS e nome de usuário.
+![Preenchendo informações da VPS](/static/images/vps-gratis/preenchendo-informacoes-vps.jpg)
+
+> 14. No campo "Key" clique no ícone de chave para adicionar sua chave privada.
+![Abrindo menu chaves privadas](/static/images/vps-gratis/termius-key.jpg)
+
+> 15. Clique em "+" para adicionar uma nova chave
+![Abrindo menu chaves privadas](/static/images/vps-gratis/termius-ssh-menu.jpg)
+
+> 16. Clique em "New SSH Key"
+![Abrindo menu chaves privadas](/static/images/vps-gratis/termius-ssh-menu-2.jpg)
+
+> 17. Clique em "Import from file" e selecione sua chave privada
+![Abrindo menu chaves privadas](/static/images/vps-gratis/selecionando-chave-termius.jpg)
+
+> 18. Chave adicionada com sucesso, clique no "&#10003;" para confirmar a chave e, em seguida, no "&#10003;" novamente para salvar.
+![Abrindo menu chaves privadas](/static/images/vps-gratis/termius-chave-adicionada.jpg)
+
+> 19. Na tela inicial, clique na VPS adicionada para acessar a VPS via SSH.
+![Abrindo menu chaves privadas](/static/images/vps-gratis/conectando-vps-termius.jpg)
+![VPS conectada](/static/images/vps-gratis/termius-vps-conectada.jpg)
+
+Pronto! Agora você pode acessar a sua VPS via Android de forma fácil e segura.
+
+## Conclusão
+
+Neste tutorial, você aprendeu como criar um servidor VPS gratuito na AWS e acessá-lo via SSH no desktop e mobile.
+
+Segue abaixo a versão em vídeo deste tutorial:
+
+<Youtube videoId="qkAZzNkGKNk"/>
+<Youtube videoId="adePSWzhpOQ"/>
