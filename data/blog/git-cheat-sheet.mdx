@@ -1,0 +1,138 @@
+---
+title: 'Git Cheat Sheet: Principais Comandos do Git'
+date: '2024-08-28'
+summary: 'Folha de dicas desenvolvida para ser uma rápida referência para os comandos do Git mais usados no dia a dia.'
+tags: ['cheat-sheet']
+draft: false
+---
+
+<TOCInline toc={props.toc} asDisclosure />
+
+## O que é o Git
+
+O Git é um sistema de controle de versão distribuído, usado para manter um histórico de alterações ao longo do desenvolvimento de um projeto. 
+
+Com ele é possível desenvolver projetos com várias pessoas ao mesmo tempo, sem que haja conflitos entre as alterações feitas por cada um.
+
+## Instalação
+
+### Windows
+
+Para instalar o Git no Windows, acesse o site oficial e baixe o instalador.
+
+[https://git-scm.com/downloads](https://git-scm.com/downloads)
+
+### Linux
+
+```bash
+sudo apt-get install git
+```
+
+### macOS
+
+```bash
+brew install git
+```
+
+## Configuração
+
+Para configurar seu usuário no Git, use os seguintes comandos:
+
+| **Comandos**                             | **Descrição**                                                           |
+|------------------------------------------|-------------------------------------------------------------------------|
+| git config --global user.name \<nome\>   | Define o nome que será exibido no histórico de commits                  |
+| git config --global user.email \<email\> | Define o email que será associado aos commits                           |
+| git config --global color.ui auto        | Define automaticamente a cor de saída no terminal                       |
+
+## Comandos Básicos
+
+| **Comandos**                           | **Descrição**                                                                                           |
+|----------------------------------------|---------------------------------------------------------------------------------------------------------|
+| git init [diretório]                   | Inicializa um novo repositório                                                                          |
+| git clone \<repositório\> [diretório]  | Clona o repositório                                                                                     |
+| git add \<caminho\>                    | Adiciona as mudanças/arquivos ao próximo commit                                                         |
+| git rm \<caminho\>                     | Deleta o(s) arquivo(s) especificados                                                                    |
+| git commit -a                          | Cria um novo commit com todas as mudanças automaticamente, sem a necessidade de usar o `git add`        |
+| git push \<repositório\> \<branch\>    | Envia os commits para o repositório remoto                                                              |
+| git pull \<repositório\> \<branch\>    | Atualiza o repositório local com as mudanças do repositório remoto                                      |
+
+
+## Manipulando Arquivos e Diretórios
+
+| **Comandos**                               | **Descrição**                                                                  |
+|--------------------------------------------|--------------------------------------------------------------------------------|
+| git status                                 | Exibe os arquivos modificados                                                  |
+| git add \<arquivo\>                        | Adiciona as mudanças do arquivo no stage (próximo commit)                      |
+| git rm \<arquivo\>                         | Deleta o arquivo do projeto e do stage                                         |
+| git rm --cached \<arquivo\>                | Remove o arquivo do stage, mas mantém o arquivo localmente                     |
+| git mv \<caminho-antigo\> \<novo-caminho\> | Move o arquivo                                                                 |
+| git diff                                   | Exibe as diferenças dos arquivos modificados, mas que ainda não estão no stage |
+| git diff --staged                          | Exibe as diferenças dos arquivos no stage                                      |
+| git log --stat -M                          | Exibe o log de todos os commits com arquivos movidos                           |
+
+## Commits
+
+| **Comandos**                          | **Descrição**                                                                 |
+|---------------------------------------|-------------------------------------------------------------------------------|
+| git commit                            | Cria um novo commit com as mudanças no stage                                  |
+| git commit -a                         | Cria um novo commit com todas as mudanças                                     |
+| git commit -m \<mensagem\>            | Cria um novo commit com as mudanças no stage e a mensagem especificada        |
+| git commit -am \<mensagem\>           | Cria um novo commit com todas as mudanças e a  mensagem especificada          |
+| git commit --amend                    | Adiciona arquivos ao último commit                                            |
+| git commit --amend -m \<mensagem\>    | Adiciona arquvios e altera a mensagem do último commit                        |
+| git commit --amend --no-edit          | Adiciona arquivos ao último commit sem alterar a mensagem dp commit           |
+
+## Branches, Checkout, Merge e Tags
+
+| **Comandos**                           | **Descrição**                                                          |
+|----------------------------------------|------------------------------------------------------------------------|
+| git branch                             | Lista todas os branches do repositório                                 |
+| git branch -r                          | Lista todos os branches remotos                                        |
+| git branch -a                          | Lista todos os branches locais e remotos                               |
+| git branch \<branch\>                  | Cria um novo branch com o nome especificado                            |
+| git branch -d \<branch\>               | Deleta o branch especificado                                           |
+| git branch -D \<branch\>               | Força o delete do branch especificado                                  |
+|                                        |                                                                        |
+| git checkout \<branch\>                | Alterna para o branch especificado                                     |
+| git checkout -b \<branch\>             | Cria um novo branch e alterna para ele                                 |
+| git checkout checkout -- \<arquivo\>   | Desfaz as mudanças feitas no arquivo especificado no último commit     |
+|                                        |                                                                        |
+| git merge \<branch\>                   | Faz o merge do branch especificado com o branch atual                  |
+|                                        |                                                                        |
+| git tag                                | Lista todas as tags do repositório                                     |
+| git tag \<tag\>                        | Cria uma tag no commit atual                                           |
+| git tag \<tag-name\> \<commit\>        | Cria uma tag no commit especificado                                    |
+| git tag -a \<tag\> -m \<mensagem\>     | Cria uma tag com a mensagem especificada                               |
+
+## Logs
+
+| **Comandos**             | **Descrição**                                                                                   |
+|--------------------------|-------------------------------------------------------------------------------------------------|
+| git log                  | Histórico de commits                                                                            |
+| git log -p               | Exibe o histórico de commits com o diff completo de cada arquivo                                |
+| git log --stat --summary | Exibe o histórico de commits com o número de linhas alterada em cada arquivo                    |
+| git log --stat -M        | Exibe o log de todos os commits com mudanças no path de arquivos                                |
+
+## Git-Remote
+
+| **Comandos**                            | **Descrição**                                                                 |
+|-----------------------------------------|-------------------------------------------------------------------------------|
+| git remote                              | Lista os repositórios remotos                                                 |
+| git remote add \<nome\> \<url\>         | Adiciona um repositório remoto                                                |
+| git remote rm \<nome\>                  | Remove um repositório remoto                                                  |
+| git remote show \<nome\>                | Exibe informações sobre um repositório remoto                                 |
+| git remote rename \<nome\> \<novo-nome\>| Renomeia um repositório remoto                                                |
+| git remote set-url \<nome\> \<url\>     | Altera a URL de um repositório remoto                                         |
+
+## Sincronizando Dados com o Repositório Remoto
+
+| **Comandos**                           | **Descrição**                                                               |
+|----------------------------------------|-----------------------------------------------------------------------------|
+| git fetch \<repositório\>              | Baixa as mudanças do repositório remoto, incluindo novos branches e commits |
+| git pull \<repositório\> \<branch\>    | Atualiza o repositório local com as mudanças do repositório remoto          |
+| git push \<repositório\> \<branch\>    | Envia os commits para o repositório remoto                                  |
+| git push --all                         | Envia as mudanças em todos os branches para o repositório remoto            |
+
+## Conclusão
+
+Este foi o resumo de alguns dos comandos mais utilizados do Git, espero que seja útil para outros desenvolvedores. Para mais informações, consulte a documentação oficial do Git.
