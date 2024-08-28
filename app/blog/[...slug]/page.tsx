@@ -51,7 +51,7 @@ export async function generateMetadata({
   })
 
   return {
-    title: post.title,
+    title: `${post.title} | ReddyyZ`,
     description: post.summary,
     openGraph: {
       title: post.title,
