@@ -1,0 +1,46 @@
+---
+title: 'Conventional Commits: Padrões de commits no Git'
+date: '2024-09-03'
+summary: 'Padrões recomendados para a publicação de commits que facilitam a leitura e manutenção do código.'
+tags: ['git', 'cheat-sheet']
+draft: false
+---
+
+Neste artigo, apresento o que é o [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) e como utilizá-lo durante o desenvolvimento para manter a organização e legibilidade de commits em projetos.
+
+Utilizar um padrão nos commits durante o desenvolvimento de um projeto é uma prática que mantém o repositório mais organizado e facilita a leitura e manutenção do código. Neste artigo, apresento um resumo do padrão [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+## O que é o Conventional Commits
+
+Uma convenção simples para utilizar nas mensagens de commit. Com um conjunto definido de regras, tem como objetivo criar **históricos de commits explicítos**, que **facilitam a leitura**, **navegabilidade** e **manutenção do código**.
+
+## Como utilizar em seus commits
+
+Para utilizar o Conventional Commits, basta seguir o padrão de mensagens de commit definido. Cada mensagem deve seguir o formato:
+
+```
+<type>[optional scope]: <description>
+```
+
+### Type: Tipos de commit
+
+Type é onde é especificado o tipo de alteração que está sendo realizada.
+
+Os tipos são:
+
+- **build**: Alterações em arquivos de configuração de build
+- **feat**: Nova funcionalidade
+- **fix**: Correção de bug
+- **chore**: Tarefas de build, configuração, etc
+- **docs**: Alterações na documentação
+- **style**: Alterações que não afetam o código (formatação, ponto e vírgula, etc)
+- **refactor**: Refatoração de código
+- **test**: Adição de testes
+- **perf**: Melhorias de performance
+- **ci**: Alterações em arquivos de configuração de CI
+- **revert**: Reverter uma alteração
+
+
+### Scope: Escopo do commit
+
+### Description: Descrição do commit
